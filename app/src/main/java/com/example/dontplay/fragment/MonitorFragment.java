@@ -106,9 +106,13 @@ public class MonitorFragment extends DialogFragment implements View.OnClickListe
 
             case R.id.bt_choose_supervisor:
                 // 选择联系人
-                Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-                pickContact.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
-                startActivityForResult(pickContact, REQUEST_CONTACT);
+                try {
+                    Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+                    pickContact.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+                    startActivityForResult(pickContact, REQUEST_CONTACT);
+                } catch (Exception e) {
+                    Toast.makeText(getActivity(), "无读取联系人权限", Toast.LENGTH_SHORT).show();
+                }
                 break;
             default:
         }
@@ -137,7 +141,8 @@ public class MonitorFragment extends DialogFragment implements View.OnClickListe
         cursor.moveToFirst();
         mSupervisorName = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
         mSupervisorNumber = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-        mSupervisorNumber = mSupervisorNumber.replaceAll("-","");
+        mSupervisorNumber = mSupervisorNumber.replaceAll("-",""); // 去掉横杠
+        mSupervisorNumber = mSupervisorNumber.replaceAll(" ",""); // 去掉空格
         mChooseSupervisorButton.setText(mSupervisorName);
     }
 }

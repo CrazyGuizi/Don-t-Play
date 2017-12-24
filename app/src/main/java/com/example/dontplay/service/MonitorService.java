@@ -9,6 +9,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.dontplay.R;
 import com.example.dontplay.broadcast.AppReceiver;
@@ -44,7 +45,12 @@ public class MonitorService extends Service {
         public void monitorWhenInstall(String packageName) { // 通过包名匹配应用名
             String name = getAppName(packageName, mApps);
             if (!TextUtils.isEmpty(name)) {
-                sendMessage(mContext, FLAG_INSTALL, null, name);
+                try {
+                    sendMessage(mContext, FLAG_INSTALL,  name);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(mContext, "无发送短信权限", Toast.LENGTH_SHORT).show();
+                }
             }
             Log.d(TAG, "monitorWhenInstall: 启动了");
         }
@@ -53,7 +59,12 @@ public class MonitorService extends Service {
         public void monitorWhenUninstall(String packageName) {
             String name = getAppName(packageName, mApps);
             if (!TextUtils.isEmpty(name)) {
-                sendMessage(mContext, FLAG_UNINSTALL, null, name);
+                try {
+                    sendMessage(mContext, FLAG_UNINSTALL,  name);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(mContext, "无发送短信权限", Toast.LENGTH_SHORT).show();
+                }
             }
             Log.d(TAG, "monitorWhenUninstall: 启动了");
         }
@@ -124,7 +135,9 @@ public class MonitorService extends Service {
                 name += app.getName() + "，";
             }
             name = name.substring(0,name.length()-1);
-            sendMessage(mContext,FLAG_START, mSharedPreferences.getString("supervisorName", ""), name);
+
+                sendMessage(mContext,FLAG_START, name);
+
         }
         Log.d(TAG, "startMonitor: 启动了");
     }

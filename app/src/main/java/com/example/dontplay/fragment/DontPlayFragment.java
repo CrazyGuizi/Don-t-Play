@@ -1,13 +1,18 @@
 package com.example.dontplay.fragment;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTabHost;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +42,8 @@ import static com.example.dontplay.util.AppUtil.getAllApps;
 public class DontPlayFragment extends Fragment implements AllAppFragment.onTabooAppListener,TabooAppFragment.onCancelTabooAppListener {
 
     private static final String TAG = "DontPlayFragment";
+    private static final int GRANTED_CONTACTS = 1; // 获取读联系人权限
+    private static final int GRANTED_SMS = 2; // 获取发送短信权限
 
     private View mView; // 保存view
     private List<Tab> mTabs = new ArrayList<>(); // 用于存放底部导航栏的选项
@@ -63,6 +70,7 @@ public class DontPlayFragment extends Fragment implements AllAppFragment.onTaboo
         mFragmentManager = getChildFragmentManager();
         mInflater = getLayoutInflater();
 
+        getGranted();
         mPackageManager = getActivity().getPackageManager();
         mAppLab = AppLab.get(getActivity()); // 实例化单例
 
@@ -75,6 +83,27 @@ public class DontPlayFragment extends Fragment implements AllAppFragment.onTaboo
         }).start();
     }
 
+    // 动态获取权限
+    private void getGranted() {
+        String[] permission = new String[] {Manifest.permission.READ_CONTACTS, Manifest.permission.SEND_SMS};
+        int granted = 0;
+        for (String p : permission) {
+            if (ContextCompat.checkSelfPermission(getActivity(), p) != mPackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(), new String[] {p}, ++granted);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (grantResults.length >0) {
+            for (int i = 0; i < grantResults.length; i++) {
+                if (grantResults[i] != mPackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(getActivity(), "无权限部分功能受限", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
 
     // 缓存Fragment，避免每次切换都重新生成
     @Nullable

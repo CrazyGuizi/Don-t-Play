@@ -2,12 +2,14 @@ package com.example.dontplay.util;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.example.dontplay.R;
@@ -81,23 +83,31 @@ public class AppUtil {
 
 
     // 不同标志发送不同的信息，比如有重新安装了禁忌软件的时候说不同于卸载软件时候的话
-    public static void sendMessage (Context context, int flag,String supervisor, String message) {
-        Intent send = new Intent(Intent.ACTION_SEND);
-        send.setType("text/plain");
-        send.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        switch (flag) {
-            case FLAG_START:
-                send.putExtra(Intent.EXTRA_TEXT, context.getString(R.string.dont_play_send_message_on_start, supervisor,message));
-                break;
-            case FLAG_INSTALL:
-                send.putExtra(Intent.EXTRA_TEXT, context.getString(R.string.dont_play_send_message_on_install,message));
-                break;
-            case FLAG_UNINSTALL:
-                send.putExtra(Intent.EXTRA_TEXT, context.getString(R.string.dont_paly_send_message_on_uninstall, message));
-                break;
-            default:
+    public static void sendMessage (Context context, int flag, String message)  {
+        String TAG = "sendMessage";
+        String number = context.getSharedPreferences("server", Context.MODE_PRIVATE).getString("supervisorNumber", null);
+        String supervisor = context.getSharedPreferences("server", Context.MODE_PRIVATE).getString("supervisorName", null);
+        android.telephony.SmsManager smsManager = android.telephony.SmsManager.getDefault();
+        StringBuffer text = new StringBuffer();
+        if (!TextUtils.isEmpty(message)) {
+            switch (flag) {
+                case FLAG_START:
+                    text.append(context.getString(R.string.dont_play_send_message_on_start, supervisor,message));
+                    break;
+                case FLAG_INSTALL:
+                    text.append(context.getString(R.string.dont_play_send_message_on_install,message));
+                    break;
+                case FLAG_UNINSTALL:
+                    text.append(context.getString(R.string.dont_paly_send_message_on_uninstall, message));
+                    break;
+                default:
+            }
         }
-        context.startActivity(send);
+        List<String> divideContents = smsManager.divideMessage(text.toString());
+        Log.d(TAG, "sendMessage:电话" +number + "\n内容:\n" +divideContents.toString());
+        for (String s : divideContents) {
+            smsManager.sendTextMessage(number, null, s, null, null);
+        }
     }
 
 }

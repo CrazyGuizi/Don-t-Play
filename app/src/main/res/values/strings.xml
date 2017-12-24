@@ -11,7 +11,7 @@
     <string name="dont_play_choose_supervisor">选择监督者</string>
     <string name="dont_play_cancel_monitor">停止</string>
     <string name="dont_play_commit_monitor">启动</string>
-    <string name="dont_play_send_message_on_start">%1$s，啊啊啊啊~~我竟然还在使用%2$s这些垃圾软件!我感觉我没救了！请爸爸教我怎么做人，打不死不罢手的那种！</string>
+    <string name="dont_play_send_message_on_start">%1$s爸爸，o(╥﹏╥)o~~我竟然还在使用%2$s这些垃圾软件!我感觉我没救了！请爸爸教我怎么做人，打不死不罢手的那种！</string>
     <string name="dont_play_send_message_on_install">我的天！我是个呆瓜吗？还是大傻逼？宇宙无敌螺旋爆炸巨垃圾的%s我竟然又装上了！有毒！爸爸快救我！</string>
     <string name="dont_paly_send_message_on_uninstall">爸爸，我已经卸载了%s啦！</string>
 </resources>

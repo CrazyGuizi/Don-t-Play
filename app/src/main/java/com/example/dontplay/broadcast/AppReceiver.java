@@ -41,7 +41,12 @@ public class AppReceiver extends BroadcastReceiver {
         if (intent.getAction().equals(ACTION_PACKAGE_ADDED)) { // 监听安装实现逻辑功能
             if ((mAppFromDB = getAppFromDB(intent)) != null) { // 在数据库中找得到这个软件
                 if (mAppFromDB.getIsTaboo() != 0) { // 黑名单中的软件，一经安装或者更新立刻给监督人发送短信服务
-                    AppUtil.sendMessage(context, AppUtil.FLAG_INSTALL, null, mAppFromDB.getName());
+                    try {
+                        AppUtil.sendMessage(context, AppUtil.FLAG_INSTALL, mAppFromDB.getName());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(context, "无发送短信权限", Toast.LENGTH_SHORT).show();
+                    }
                     Log.d(TAG, "onReceive: 又安装了软件" + mPackageName);
                 }
             }
@@ -57,7 +62,12 @@ public class AppReceiver extends BroadcastReceiver {
                     if (mAppFromDB.getIsTaboo() == 1) {
                         mAppFromDB.setIsTaboo(2);
                         appLab.updateApp(mAppFromDB);
-                        AppUtil.sendMessage(context, AppUtil.FLAG_UNINSTALL, null, mAppFromDB.getName());
+                        try {
+                            AppUtil.sendMessage(context, AppUtil.FLAG_UNINSTALL,  mAppFromDB.getName());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Toast.makeText(context, "无发送短信权限", Toast.LENGTH_SHORT).show();
+                        }
                         Log.d(TAG, "onReceive: 卸载了软件" + mPackageName);
                     } else if (mAppFromDB.getIsTaboo() == 0){ // 如果是非禁忌状态的软件，则从数据库中删除这一条记录
                         appLab.deleteApp(mAppFromDB);
